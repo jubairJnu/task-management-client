@@ -42,9 +42,10 @@ const SignUpForm = ({ callbackUrl }: { callbackUrl: string }) => {
           callbackUrl,
         });
         toast.success("user created successfully");
+      } else {
+        toast.error("something went wrong");
       }
     } catch (err) {
-      console.log(err);
       toast.error("something went wrong");
     }
   };

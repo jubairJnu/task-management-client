@@ -17,13 +17,6 @@ export async function postUserSignup(
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
-      }
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
     const result = await response.json();
     console.log(result, "result");
     return result;

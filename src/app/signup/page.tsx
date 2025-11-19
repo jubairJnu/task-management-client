@@ -1,6 +1,7 @@
 "use client";
 
 import SignUpForm from "@/components/shared/SignUpForm";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,6 +12,7 @@ import {
 import { ContactRound } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { toast } from "sonner";
 
 const SignUpPage = () => {
   const callbackUrl = "/home";
@@ -21,6 +23,12 @@ const SignUpPage = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome</h1>
           <p className="text-gray-600">Sign Up to your account</p>
         </div>
+        <Button
+          variant="outline"
+          onClick={() => toast("Event has been created")}
+        >
+          Default
+        </Button>
 
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader className="space-y-1 pb-4">
