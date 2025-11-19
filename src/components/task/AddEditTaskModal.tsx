@@ -22,8 +22,10 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
-import { getProjects, getTeamListByProject } from "@/lib/api";
+import { getProjects, getTeamListByProject, postTask } from "@/lib/api";
 import { TTeam } from "@/app/(withDashboardLayout)/dashboard/project/page";
+import { toast } from "sonner";
+import Loading from "@/utils/Loading";
 
 type TTAddEdmitaskModalProps = {
   title: string | JSX.Element;
@@ -40,11 +42,10 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
   } = useForm();
 
   const isEditMode = !!item;
-
+  const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projects, setProjects] = useState<any[]>([]);
-  const [teams, setTeams] = useState<TTeam[]>([]);
-  const selectedProjectId = watch("projectId");
+  const [teams, setTeams] = useState<TTeam>();
 
   useEffect(() => {
     if (isModalOpen) {
@@ -57,20 +58,20 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
     setProjects(res);
   };
 
-  useEffect(() => {
-    if (selectedProjectId) {
-      loadTeams(selectedProjectId);
+  const handleOnSubmit = async (data: FieldValues) => {
+    console.log("first")
+    setIsLoading(true);
+    const res = await postTask(data);
+    if (res && res.success) {
+      setIsLoading(false);
+      toast.success("Added succesfully");
+      reset();
+      setIsModalOpen(false);
     } else {
-      setTeams([]);
+      setIsLoading(false);
+      toast.error("someting went wrong");
     }
-  }, [selectedProjectId]);
-
-  const loadTeams = async (projectId: string) => {
-    const res = await getTeamListByProject(projectId);
-    setTeams(res);
   };
-
-  const handleOnSubmit = async (data: FieldValues) => {};
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -78,11 +79,11 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
         <DialogTrigger asChild>
           <Button variant="outline">{title}</Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="w-full lg:max-w-5xl">
           <DialogHeader>
             <DialogTitle>{isEditMode ? "Edit Task" : "Add Task"}</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 ">
             {/* Task Name */}
             <div className="space-y-2">
               <Label>Task Name *</Label>
@@ -95,7 +96,9 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
                 )}
               />
               {errors?.title && (
-                <span className="text-red-500">{errors.title.message}</span>
+                <span className="text-red-500">
+                  {errors.title.message as string}
+                </span>
               )}
             </div>
 
@@ -129,7 +132,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select priority" />
                     </SelectTrigger>
                     <SelectContent>
@@ -159,7 +162,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -186,10 +189,19 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
                 rules={{ required: "Project is required" }}
                 render={({ field }) => (
                   <Select
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+
+                      const selectedProject = projects.find(
+                        (p) => p._id === value
+                      );
+
+                      // Set team data
+                      setTeams(selectedProject?.teamId);
+                    }}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select project" />
                     </SelectTrigger>
                     <SelectContent>
@@ -220,7 +232,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select member" />
                     </SelectTrigger>
                     <SelectContent>
@@ -245,7 +257,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit">{isLoading ? <Loading /> : "Submit"}</Button>
           </DialogFooter>
         </DialogContent>
       </form>

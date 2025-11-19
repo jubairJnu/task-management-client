@@ -20,6 +20,7 @@ export type TTeam = {
   _id: string;
   name: string;
   capacity?: number;
+  members: [{ name: ""; capacity: 3; role: "Member" }];
 };
 
 const ProjectPage = () => {
