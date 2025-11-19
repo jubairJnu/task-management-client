@@ -117,12 +117,56 @@ export async function getTasks(): Promise<any[]> {
     return [];
   }
 }
+export async function getStats(): Promise<any[]> {
+  try {
+    const response = await fetch(`${config.api_url}/stats/dashboard`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch stats");
+    }
+
+    const result = await response.json();
+    return result?.data || [];
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    return [];
+  }
+}
 
 // post task == /tasks
 
 export async function postTask(payload: any): Promise<any | null> {
   try {
     const response = await fetch(`${config.api_url}/tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create task");
+    }
+
+    const result = await response.json();
+    return result; // should contain success + data
+  } catch (error) {
+    console.error("Error creating task:", error);
+    return null;
+  }
+}
+
+export async function postReassignTasks(payload: any): Promise<any | null> {
+  try {
+    const response = await fetch(`${config.api_url}/reassign`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

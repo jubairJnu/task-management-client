@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Phone, Lock, Eye, EyeOff, ContactRound } from "lucide-react";
+import { Phone, Lock, Eye, EyeOff, ContactRound, Mail } from "lucide-react";
 import { useState } from "react";
 import { set, useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
@@ -58,14 +58,15 @@ const LoginForm = ({ callbackUrl }: { callbackUrl: string }) => {
             htmlFor="login-phone"
             className="text-sm font-medium text-gray-700"
           >
-            Phone Number
+            Email
           </Label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               id="login-phone"
               type="tel"
-              placeholder="Enter your phone number"
+              placeholder="Enter Email"
+              defaultValue="jubair2810@gmail.com"
               className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               {...loginForm.register("email", {
                 required: "Email is required",
@@ -92,6 +93,7 @@ const LoginForm = ({ callbackUrl }: { callbackUrl: string }) => {
               id="login-password"
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
+              defaultValue="123456"
               className="pl-10 pr-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               {...loginForm.register("password", {
                 required: "Password is required",
