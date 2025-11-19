@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -9,27 +10,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getTeamList } from "@/lib/api";
+import { getTeamList, postProject } from "@/lib/api";
+import Loading from "@/utils/Loading";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FieldValues, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export type TTeam = {
   _id: string;
   name: string;
   capacity?: number;
-  // other fields…
-};
-
-type TRes = {
-  data: TTeam[];
 };
 
 const ProjectPage = () => {
-  const [teamList, setTeamList] = useState<TRes>();
+  const [teamList, setTeamList] = useState<TTeam[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const loadTeams = async () => {
       const data = await getTeamList();
-      setTeamList(data as any);
+      setTeamList(data);
     };
     loadTeams();
   }, []);
@@ -37,15 +36,33 @@ const ProjectPage = () => {
   const {
     control,
     formState: { errors },
+    reset,
+    handleSubmit,
   } = useForm();
+
+  const handleAdd = async (data: FieldValues) => {
+    setIsLoading(true);
+    const res = await postProject(data);
+    if (res && res.success) {
+      setIsLoading(false);
+      toast.success("Added successfully");
+      reset();
+    } else {
+      setIsLoading(false);
+      toast.error("something went wrong");
+    }
+  };
+
+  console.log(teamList, "team");
+
   return (
     <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 h-screen overflow-y-auto">
       <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
         Create New Project
       </h2>
-      <form>
+      <form onSubmit={handleSubmit(handleAdd)}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
+          <div className="space-y-2.5">
             <Label>Project Name *</Label>
             <Controller
               name="name"
@@ -61,7 +78,7 @@ const ProjectPage = () => {
               </span>
             )}
           </div>
-          <div>
+          <div className="space-y-2.5">
             <Label>Link Team *</Label>
 
             <Controller
@@ -78,7 +95,7 @@ const ProjectPage = () => {
                   </SelectTrigger>
 
                   <SelectContent>
-                    {teamList?.data?.map((team: any) => (
+                    {teamList?.map((team: any) => (
                       <SelectItem key={team._id} value={team._id}>
                         {team.name}
                       </SelectItem>
@@ -94,6 +111,9 @@ const ProjectPage = () => {
               </span>
             )}
           </div>
+        </div>
+        <div className="mt-5 flex justify-end">
+          <Button type="submit">{isLoading ? <Loading /> : "Submit"}</Button>
         </div>
       </form>
     </div>

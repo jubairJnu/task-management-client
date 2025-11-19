@@ -1,11 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { postTeam } from "@/lib/api";
+import Loading from "@/utils/Loading";
 import { Mail, Plus, ShieldCheck, User, Users, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { FieldValues, useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const TeamPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     control,
@@ -25,9 +29,17 @@ const TeamPage = () => {
   });
 
   const onSubmit = async (data: FieldValues) => {
-    console.log("Form Data:", data);
-    // onSuccess(data);
-    reset();
+    setIsLoading(true);
+    const res = await postTeam(data);
+
+    if (res && res.success) {
+      toast.success("Added Successfully");
+      reset();
+      setIsLoading(false);
+    } else {
+      toast.error("Something went wrong");
+      setIsLoading(false);
+    }
   };
   return (
     <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
@@ -162,13 +174,7 @@ const TeamPage = () => {
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
-          >
-            <Users className="w-4 h-4" />
-            Create Team
-          </button>
+          <Button type="submit">{isLoading ? <Loading /> : "Submit"}</Button>
         </div>
       </form>
     </div>
