@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+
 import {
   Card,
   CardContent,
@@ -34,7 +34,7 @@ const DashbboardPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -110,7 +110,7 @@ const DashbboardPage = () => {
                   }`}
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
                       {member.name.charAt(0)}
                     </div>
                     <div>
@@ -151,7 +151,7 @@ const DashbboardPage = () => {
                       />
                     </div>
                     <span
-                      className={`text-sm font-medium min-w-[3rem] text-right ${
+                      className={`text-sm font-medium min-w-12 text-right ${
                         member.isOverloaded ? "text-red-600" : "text-slate-700"
                       }`}
                     >
