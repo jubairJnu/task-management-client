@@ -9,14 +9,9 @@ import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 
 interface LoginFormData {
-  phone: string;
+  email: string;
   password: string;
 }
-
-export const validatePhone = (phone: string) => {
-  const phoneRegex = /^(?!(\+88))01[3-9]\d{8}$/;
-  return phoneRegex.test(phone) || "Please enter a valid phone number";
-};
 
 export const validatePassword = (password: string) => {
   if (password.length < 6) {
@@ -35,7 +30,7 @@ const LoginForm = ({ callbackUrl }: { callbackUrl: string }) => {
     setIsLoading(true);
     try {
       const res = await signIn("credentials", {
-        phone: data.phone,
+        email: data.email,
         password: data.password,
         // redirect: false,
         callbackUrl,
@@ -72,15 +67,14 @@ const LoginForm = ({ callbackUrl }: { callbackUrl: string }) => {
               type="tel"
               placeholder="Enter your phone number"
               className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-              {...loginForm.register("phone", {
-                required: "Phone number is required",
-                validate: validatePhone,
+              {...loginForm.register("email", {
+                required: "Email is required",
               })}
             />
           </div>
-          {loginForm.formState.errors.phone && (
+          {loginForm.formState.errors.email && (
             <p className="text-sm text-red-600">
-              {loginForm.formState.errors.phone.message}
+              {loginForm.formState.errors.email.message}
             </p>
           )}
         </div>

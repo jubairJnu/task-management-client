@@ -3,12 +3,16 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Phone, Lock, Eye, EyeOff, ContactRound } from "lucide-react";
+import { Lock, Eye, EyeOff, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { validatePassword, validatePhone } from "./LoginForm";
+import { validatePassword } from "./LoginForm";
+import { postUserSignup } from "@/lib/api";
+import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 interface SignupFormData {
-  phone: string;
+  name: string;
+  email: string;
   password: string;
   confirmPassword: string;
 }
@@ -26,8 +30,23 @@ const SignUpForm = ({ callbackUrl }: { callbackUrl: string }) => {
       });
       return;
     }
-    console.log("Signup data:", data);
-    // Handle signup logic here
+
+    try {
+      const res = await postUserSignup(data);
+      console.log(res, "res");
+      if (res && res.success) {
+        await signIn("credentials", {
+          email: res.data.email,
+          password: res.data.password,
+          // redirect: false,
+          callbackUrl,
+        });
+        toast.success("user created successfully");
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("something went wrong");
+    }
   };
 
   return (
@@ -38,27 +57,52 @@ const SignUpForm = ({ callbackUrl }: { callbackUrl: string }) => {
       >
         <div className="space-y-2">
           <Label
-            htmlFor="signup-phone"
+            htmlFor="signup-name"
             className="text-sm font-medium text-gray-700"
           >
-            Phone Number
+            Name
           </Label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              id="signup-phone"
+              id="signup-name"
               type="tel"
-              placeholder="Enter your phone number"
+              placeholder="Enter your name"
               className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-              {...signupForm.register("phone", {
-                required: "Phone number is required",
-                validate: validatePhone,
+              {...signupForm.register("name", {
+                required: "Name is required",
               })}
             />
           </div>
-          {signupForm.formState.errors.phone && (
+          {signupForm.formState.errors.name && (
             <p className="text-sm text-red-600">
-              {signupForm.formState.errors.phone.message}
+              {signupForm.formState.errors.name.message}
+            </p>
+          )}
+        </div>
+        {/*  */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="signup-phone"
+            className="text-sm font-medium text-gray-700"
+          >
+            Email
+          </Label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              id="signup-phone"
+              type="tel"
+              placeholder="Enter your email"
+              className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+              {...signupForm.register("email", {
+                required: "Email is required",
+              })}
+            />
+          </div>
+          {signupForm.formState.errors.email && (
+            <p className="text-sm text-red-600">
+              {signupForm.formState.errors.email.message}
             </p>
           )}
         </div>

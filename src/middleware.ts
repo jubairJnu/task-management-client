@@ -1,7 +1,4 @@
-
-
 import { withAuth } from "next-auth/middleware";
-
 
 export default withAuth({
   callbacks: {
@@ -25,5 +22,7 @@ export default withAuth({
 
 export const config = {
   // Protect all routes except login, API routes, and static files
-  matcher: ["/((?!login|api/auth|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!login|signup|api/auth|_next/static|_next/image|favicon.ico).*)",
+  ],
 };

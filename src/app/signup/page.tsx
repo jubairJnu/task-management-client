@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
-
+import SignUpForm from "@/components/shared/SignUpForm";
 import {
   Card,
   CardContent,
@@ -9,20 +8,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { ContactRound } from "lucide-react";
-import LoginForm from "@/components/shared/LoginForm";
 import Link from "next/link";
+import { Suspense } from "react";
 
-export default function AuthPage() {
+const SignUpPage = () => {
   const callbackUrl = "/home";
-
   return (
     <div className="min-h-screen flex items-center justify-center  from-blue-50 to-indigo-100 px-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome</h1>
-          <p className="text-gray-600">Sign in to your account</p>
+          <p className="text-gray-600">Sign Up to your account</p>
         </div>
 
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
@@ -36,14 +33,14 @@ export default function AuthPage() {
           </CardHeader>
           <CardContent>
             <Suspense>
-              <LoginForm callbackUrl={callbackUrl} />
+              <SignUpForm callbackUrl={callbackUrl} />
             </Suspense>
 
             <div className="text-center mt-5">
               <p>
-                Don't have account?
-                <Link className="mx-2.5 text-blue-500" href="/signup">
-                  Sign Up
+                Already have an account?
+                <Link className="mx-2.5 text-blue-500" href="/login">
+                  Sign in
                 </Link>
               </p>
             </div>
@@ -52,4 +49,6 @@ export default function AuthPage() {
       </div>
     </div>
   );
-}
+};
+
+export default SignUpPage;

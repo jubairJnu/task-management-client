@@ -6,7 +6,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 interface CustomJwtPayload {
   id: string;
-  phone: string;
+  email: string;
   role: string;
   name: string;
   iat?: number;
@@ -19,13 +19,13 @@ const handler = NextAuth({
     CredentialsProvider({
       name: "Login",
       credentials: {
-        phone: { label: "phone", type: "text", placeholder: "Enter Phone" },
+        email: { label: "email", type: "text", placeholder: "Enter email" },
         password: { label: "Password", type: "password" },
       },
 
       async authorize(credentials) {
         const payload = {
-          phone: credentials?.phone,
+          email: credentials?.email,
           password: credentials?.password,
         };
         try {
@@ -39,7 +39,7 @@ const handler = NextAuth({
 
             return {
               id: decodedToken?.id,
-              phone: decodedToken?.phone,
+              email: decodedToken?.email,
               role: decodedToken?.role,
               name: decodedToken?.name,
               accessToken: tokens.accessToken,
@@ -68,7 +68,7 @@ const handler = NextAuth({
       if (user) {
         token.accessToken = user.accessToken ;
         token.refreshToken = user.refreshToken;
-        token.phone = user.phone;
+        token.email = user.email;
         token.role = user.role;
         token.name = user.name;
       }
@@ -78,7 +78,7 @@ const handler = NextAuth({
     async session({ session, token }) {
       session.user = {
         id: token.sub,
-        phone: token.phone as string | undefined,
+        email: token.email as string | undefined,
         role: token.role as string,
       };
       session.accessToken = token.accessToken as string;
