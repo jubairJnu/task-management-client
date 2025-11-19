@@ -15,7 +15,7 @@ import { Suspense } from "react";
 import { toast } from "sonner";
 
 const SignUpPage = () => {
-  const callbackUrl = "/home";
+  const callbackUrl = "/dashboard";
   return (
     <div className="min-h-screen flex items-center justify-center  from-blue-50 to-indigo-100 px-4 py-8">
       <div className="w-full max-w-md">

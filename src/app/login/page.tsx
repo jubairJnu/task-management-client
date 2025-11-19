@@ -15,7 +15,7 @@ import LoginForm from "@/components/shared/LoginForm";
 import Link from "next/link";
 
 export default function AuthPage() {
-  const callbackUrl = "/home";
+  const callbackUrl = "/dashboard";
 
   return (
     <div className="min-h-screen flex items-center justify-center  from-blue-50 to-indigo-100 px-4 py-8">
