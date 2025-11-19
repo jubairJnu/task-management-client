@@ -59,7 +59,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
   };
 
   const handleOnSubmit = async (data: FieldValues) => {
-    console.log("first")
+    console.log("first");
     setIsLoading(true);
     const res = await postTask(data);
     if (res && res.success) {
@@ -75,14 +75,14 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-      <form onSubmit={handleSubmit(handleOnSubmit)}>
-        <DialogTrigger asChild>
-          <Button variant="outline">{title}</Button>
-        </DialogTrigger>
-        <DialogContent className="w-full lg:max-w-5xl">
-          <DialogHeader>
-            <DialogTitle>{isEditMode ? "Edit Task" : "Add Task"}</DialogTitle>
-          </DialogHeader>
+      <DialogTrigger asChild>
+        <Button variant="outline">{title}</Button>
+      </DialogTrigger>
+      <DialogContent className="w-full lg:max-w-5xl">
+        <DialogHeader>
+          <DialogTitle>{isEditMode ? "Edit Task" : "Add Task"}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(handleOnSubmit)}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 ">
             {/* Task Name */}
             <div className="space-y-2">
@@ -253,14 +253,11 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
             </div>
           </div>
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
+          <div className="flex mt-5 justify-end">
             <Button type="submit">{isLoading ? <Loading /> : "Submit"}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+          </div>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };
