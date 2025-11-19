@@ -11,7 +11,7 @@ const HomePage = () => {
     if (status === "loading") return; // Still loading
 
     if (!session) {
-      router.push("/login");
+      router.push("/dashboard");
     } else {
       router.push("/home");
     }
