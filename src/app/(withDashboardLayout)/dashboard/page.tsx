@@ -19,8 +19,9 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import ReassignTasks from "@/components/ReasginTaskModal";
+
 import { TDashboardData } from "@/app/types";
+
 
 const DashbboardPage = () => {
   const [summayList, setSummayList] = useState<TDashboardData>();
@@ -46,8 +47,6 @@ const DashbboardPage = () => {
               Monitor workload and manage task assignments
             </p>
           </div>
-
-          <ReassignTasks />
         </div>
 
         {/* Stats Cards */}
@@ -160,6 +159,7 @@ const DashbboardPage = () => {
                       )}
                       %
                     </span>
+                    
                   </div>
                 </div>
               ))}

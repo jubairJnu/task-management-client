@@ -21,3 +21,18 @@ export type TDashboardData = {
   teamSummary: TTeamSummary[];
   recentReassignments: TRecentReassignment[];
 };
+
+export type TTeam = {
+  _id: string;
+  name: string;
+  capacity?: number;
+  members: [
+    {
+      name: string;
+      capacity: number;
+      role: string;
+      _id: string;
+      currentTasks: number;
+    }
+  ];
+};

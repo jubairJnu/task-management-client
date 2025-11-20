@@ -1,5 +1,6 @@
 "use client";
 
+import { TTeam } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,12 +17,6 @@ import { useEffect, useState } from "react";
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export type TTeam = {
-  _id: string;
-  name: string;
-  capacity?: number;
-  members: [{ name: ""; capacity: 3; role: "Member" }];
-};
 
 const ProjectPage = () => {
   const [teamList, setTeamList] = useState<TTeam[]>([]);
