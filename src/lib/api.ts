@@ -3,6 +3,7 @@
 "use server";
 
 import config from "@/config";
+import { revalidateTag } from "next/cache";
 
 export async function postUserSignup(
   payload: any
@@ -102,6 +103,7 @@ export async function getTasks(params: any = {}): Promise<any[]> {
     const response = await fetch(
       `${config.api_url}/tasks${queryString ? `?${queryString}` : ""}`,
       {
+        next: { tags: ["tasks"] },
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -159,7 +161,7 @@ export async function postTask(payload: any): Promise<any | null> {
     if (!response.ok) {
       throw new Error("Failed to create task");
     }
-
+    revalidateTag("tasks", "max");
     const result = await response.json();
     return result; // should contain success + data
   } catch (error) {
@@ -185,7 +187,7 @@ export async function updateTask(options: {
     if (!response.ok) {
       throw new Error("Failed to create task");
     }
-
+    revalidateTag("tasks", "max");
     const result = await response.json();
     return result; // should contain success + data
   } catch (error) {
@@ -206,7 +208,7 @@ export async function deleteTask(id: string): Promise<any | null> {
     if (!response.ok) {
       throw new Error("Failed to create task");
     }
-
+    revalidateTag("tasks", "max");
     const result = await response.json();
     return result; // should contain success + data
   } catch (error) {
