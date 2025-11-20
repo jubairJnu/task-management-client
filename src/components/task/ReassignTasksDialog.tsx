@@ -110,6 +110,7 @@ export default function ReassignTasksDialog({
       }));
 
       // Send to your backend API
+      console.log("call apio", reassignmentData);
       const res = await postReassignTasks(reassignmentData);
       if (res && res.success) {
         setLoading(false);

@@ -10,10 +10,20 @@ export type TTeamSummary = {
 
 export type TRecentReassignment = {
   _id: string;
-  taskId: string;
-  fromMember: string;
-  toMember: string;
-  timestamp: string; // ISO string
+  task: {
+    title: string;
+    priority: string;
+    _id: string;
+  };
+  fromMember: {
+    name: string;
+    _id: string;
+  };
+  toMember: {
+    name: string;
+    _id: string;
+  };
+  createdAt: string; // ISO string
 };
 
 export type TDashboardData = {

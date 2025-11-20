@@ -188,21 +188,21 @@ const DashbboardPage = () => {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-slate-900">
-                          Task #{reassignment.taskId}
+                          Task #{reassignment.task?.title}
                         </p>
                         <p className="text-xs text-slate-600">
                           <span className="font-medium">
-                            {reassignment.fromMember}
+                            {reassignment.fromMember?.name}
                           </span>
                           <ArrowRight className="w-3 h-3 inline mx-1" />
                           <span className="font-medium">
-                            {reassignment.toMember}
+                            {reassignment.toMember?.name}
                           </span>
                         </p>
                       </div>
                     </div>
                     <span className="text-xs text-slate-500">
-                      {moment(reassignment.timestamp).fromNow()}
+                      {moment(reassignment.createdAt).fromNow()}
                     </span>
                   </div>
                 ))}
