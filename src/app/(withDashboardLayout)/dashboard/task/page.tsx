@@ -19,7 +19,9 @@ const TaskPage = () => {
 
   useEffect(() => {
     const loadTasks = async () => {
-      const data = await getTasks();
+      const data = await getTasks({
+        status: "Pending",
+      });
       setTaskList(data);
     };
     loadTasks();

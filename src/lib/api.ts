@@ -96,15 +96,19 @@ export async function getProjects(): Promise<any[]> {
 
 // get task// == /tasks
 
-export async function getTasks(): Promise<any[]> {
+export async function getTasks(params: any = {}): Promise<any[]> {
   try {
-    const response = await fetch(`${config.api_url}/tasks`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
+    const queryString = new URLSearchParams(params).toString();
+    const response = await fetch(
+      `${config.api_url}/tasks${queryString ? `?${queryString}` : ""}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch tasks");
