@@ -34,15 +34,6 @@ type TTAddEdmitaskModalProps = {
 };
 
 const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm();
-
   const isEditMode = !!item;
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,6 +41,35 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
   const [teams, setTeams] = useState<TTeam>();
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [showWarning, setShowWarning] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      title: item?.title || "",
+      description: item?.description || "",
+      priority: item?.priority || "",
+      status: item?.status || "",
+      projectId: item?.projectId || "",
+      assignedMemberId: item?.assignedMemberId || "",
+    },
+  });
+
+  useEffect(() => {
+    if (isModalOpen) loadProjects();
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    if (isEditMode && projects.length > 0) {
+      reset(item);
+      const selectedProject = projects.find((p) => p._id === item.projectId);
+      setTeams(selectedProject?.teamId);
+    }
+  }, [projects, isEditMode]);
 
   const handleAssignChange = (memberId: string) => {
     const member = teams?.members?.find((m: any) => m._id === memberId);
