@@ -26,7 +26,7 @@ import {
   Loader2,
   UserCheck,
 } from "lucide-react";
-import { TTeamSummary } from "@/app/types";
+import { IReassgingTask, ITask, TTeamSummary } from "@/app/types";
 
 export default function ReassignTasksDialog({
   teamMembers,
@@ -35,21 +35,20 @@ export default function ReassignTasksDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [reassignments, setReassignments] = useState([]);
+  const [reassignments, setReassignments] = useState<IReassgingTask[]>([]);
   const [completed, setCompleted] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
 
-  // Mock data - replace with your actual data
-
   const calculateReassignments = () => {
     const suggestions: any = [];
+
+    console.log(suggestions, "suggestions");
 
     // Find overloaded members
     const overloadedMembers = teamMembers.filter(
       (m) => m.isOverloaded && m.tasks
     );
 
-    // Find members with free capacity
     const availableMembers = teamMembers
       .filter((m) => m.currentTasks < m.capacity)
       .sort((a, b) => a.currentTasks - b.currentTasks);
@@ -57,13 +56,11 @@ export default function ReassignTasksDialog({
     overloadedMembers.forEach((overloaded) => {
       const tasksToMove = overloaded.currentTasks - overloaded.capacity;
 
-      // Get low and medium priority tasks
       const movableTasks = overloaded.tasks
         .filter((task) => task.priority === "Low" || task.priority === "Medium")
         .slice(0, tasksToMove);
 
-      movableTasks.forEach((task) => {
-        // Find best member (least loaded with capacity)
+      movableTasks.forEach((task: ITask) => {
         const bestMember = availableMembers.find(
           (m) => m.currentTasks < m.capacity && m._id !== overloaded._id
         );
@@ -71,12 +68,10 @@ export default function ReassignTasksDialog({
         if (bestMember) {
           suggestions.push({
             taskId: task._id,
-            taskTitle: task.title,
-            priority: task.priority,
+
             fromMemberId: overloaded._id,
-            fromMemberName: overloaded.name,
+
             toMemberId: bestMember._id,
-            toMemberName: bestMember.name,
           });
 
           // Update temporary capacity for next iteration
@@ -99,15 +94,14 @@ export default function ReassignTasksDialog({
     }, 1000);
   };
 
-  const handleChooseAnother = (index: number, newMemberId) => {
+  const handleChooseAnother = (index: number, newMemberId: string) => {
     const newMember = teamMembers.find((m) => m._id === newMemberId);
     if (!newMember) return;
 
     const updatedReassignments = [...reassignments];
     updatedReassignments[index] = {
       ...updatedReassignments[index],
-      toMemberId: newMember._id,
-      toMemberName: newMember.name,
+      toMemberId: { name: newMember.name, _id: newMember._id },
     };
     setReassignments(updatedReassignments);
     setEditingIndex(null);
@@ -157,16 +151,16 @@ export default function ReassignTasksDialog({
     }
   };
 
-  const getMemberWorkload = (memberId) => {
+  const getMemberWorkload = (memberId: string) => {
     const member = teamMembers.find((m) => m._id === memberId);
     if (!member) return null;
 
     // Calculate projected workload including pending reassignments
     const incomingTasks = reassignments.filter(
-      (r) => r.toMemberId === memberId
+      (r) => r.toMemberId._id === memberId
     ).length;
     const outgoingTasks = reassignments.filter(
-      (r) => r.fromMemberId === memberId
+      (r) => r.fromMemberId._id === memberId
     ).length;
     const projectedTasks = member.currentTasks + incomingTasks - outgoingTasks;
 
@@ -293,18 +287,18 @@ export default function ReassignTasksDialog({
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">
-                                {r.taskTitle}
+                                {r.taskId?.title}
                               </p>
                               <div className="flex items-center gap-2 mt-1 flex-wrap">
                                 <Badge variant="outline" className="text-xs">
-                                  {r.priority}
+                                  {r.taskId?.priority}
                                 </Badge>
                                 <span className="text-xs text-slate-600">
-                                  {r.fromMemberName}
+                                  {r?.fromMemberId?.name}
                                 </span>
                                 <ArrowRight className="w-3 h-3 text-slate-400" />
                                 <span className="text-xs font-medium text-blue-700">
-                                  {r.toMemberName}
+                                  {r?.toMemberId?.name}
                                 </span>
                               </div>
                             </div>
@@ -323,7 +317,7 @@ export default function ReassignTasksDialog({
                             <div className="flex items-center gap-2 pt-2 border-t">
                               <UserCheck className="w-4 h-4 text-slate-500" />
                               <Select
-                                value={r.toMemberId}
+                                value={r.toMemberId._id}
                                 onValueChange={(value) =>
                                   handleChooseAnother(idx, value)
                                 }
@@ -333,7 +327,7 @@ export default function ReassignTasksDialog({
                                 </SelectTrigger>
                                 <SelectContent>
                                   {teamMembers
-                                    .filter((m) => m._id !== r.fromMemberId)
+                                    .filter((m) => m._id !== r.fromMemberId._id)
                                     .map((member) => {
                                       const workload = getMemberWorkload(
                                         member._id
@@ -377,7 +371,7 @@ export default function ReassignTasksDialog({
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => setEditingIndex(idx)}
+                              onClick={() => setEditingIndex(idx as any)}
                               className="w-full h-8 text-xs"
                             >
                               <UserCheck className="w-3 h-3 mr-2" />

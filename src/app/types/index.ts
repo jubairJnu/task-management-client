@@ -5,6 +5,7 @@ export type TTeamSummary = {
   capacity: number;
   currentTasks: number;
   isOverloaded: boolean;
+  tasks: ITask[];
 };
 
 export type TRecentReassignment = {
@@ -36,3 +37,29 @@ export type TTeam = {
     }
   ];
 };
+
+export interface ITask {
+  _id: string;
+  title: string;
+  description: string;
+  assignedMemberId: string;
+  priority: "Low" | "Medium" | "High";
+  status: "Pending" | "In Progress" | "Done";
+  projectId: string;
+}
+
+export interface IReassgingTask {
+  taskId: {
+    title: string;
+    priority: string;
+    _id: string;
+  };
+  fromMemberId: {
+    name: string;
+    _id: string;
+  };
+  toMemberId: {
+    name: string;
+    _id: string;
+  };
+}
