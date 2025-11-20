@@ -43,7 +43,7 @@ export function NavMain({
           const hasSubItems = item.items && item.items.length > 0;
           const isActive =
             pathname === item.url ||
-            (pathname.startsWith(item.url) && item.url !== "/");
+            (pathname.startsWith(item.url) && item.url !== "/dashboard");
 
           if (hasSubItems) {
             // 🔸 Has nested items → use Collapsible

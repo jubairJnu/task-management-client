@@ -62,4 +62,8 @@ export interface IReassgingTask {
     name: string;
     _id: string;
   };
+  taskTitle?: string;
+  priority?: string;
+  fromMemberName?: string;
+  toMemberName?: string;
 }

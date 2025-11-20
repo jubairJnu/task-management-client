@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 
 import { TDashboardData } from "@/app/types";
-
+import ReassignTasksDialog from "@/components/task/ReassignTasksDialog";
 
 const DashbboardPage = () => {
   const [summayList, setSummayList] = useState<TDashboardData>();
@@ -47,6 +47,7 @@ const DashbboardPage = () => {
               Monitor workload and manage task assignments
             </p>
           </div>
+          <ReassignTasksDialog teamMembers={summayList?.teamSummary as any} />
         </div>
 
         {/* Stats Cards */}
@@ -159,7 +160,6 @@ const DashbboardPage = () => {
                       )}
                       %
                     </span>
-                    
                   </div>
                 </div>
               ))}

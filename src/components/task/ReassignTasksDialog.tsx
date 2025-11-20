@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,13 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   Users,
   ArrowRight,
@@ -27,6 +21,8 @@ import {
   UserCheck,
 } from "lucide-react";
 import { IReassgingTask, ITask, TTeamSummary } from "@/app/types";
+import { postReassignTasks } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function ReassignTasksDialog({
   teamMembers,
@@ -37,7 +33,8 @@ export default function ReassignTasksDialog({
   const [loading, setLoading] = useState(false);
   const [reassignments, setReassignments] = useState<IReassgingTask[]>([]);
   const [completed, setCompleted] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
+
+  console.log(reassignments, "ers");
 
   const calculateReassignments = () => {
     const suggestions: any = [];
@@ -68,10 +65,12 @@ export default function ReassignTasksDialog({
         if (bestMember) {
           suggestions.push({
             taskId: task._id,
-
+            taskTitle: task.title,
             fromMemberId: overloaded._id,
-
+            fromMemberName: overloaded.name,
+            priority: task.priority,
             toMemberId: bestMember._id,
+            toMemberName: bestMember.name,
           });
 
           // Update temporary capacity for next iteration
@@ -79,7 +78,7 @@ export default function ReassignTasksDialog({
         }
       });
     });
-
+    setReassignments(suggestions);
     return suggestions;
   };
 
@@ -92,19 +91,6 @@ export default function ReassignTasksDialog({
     setTimeout(() => {
       setLoading(false);
     }, 1000);
-  };
-
-  const handleChooseAnother = (index: number, newMemberId: string) => {
-    const newMember = teamMembers.find((m) => m._id === newMemberId);
-    if (!newMember) return;
-
-    const updatedReassignments = [...reassignments];
-    updatedReassignments[index] = {
-      ...updatedReassignments[index],
-      toMemberId: { name: newMember.name, _id: newMember._id },
-    };
-    setReassignments(updatedReassignments);
-    setEditingIndex(null);
   };
 
   const handleRemoveReassignment = (index: number) => {
@@ -124,27 +110,16 @@ export default function ReassignTasksDialog({
       }));
 
       // Send to your backend API
-      // const response = await fetch('/api/reassign-tasks', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ reassignments: reassignmentData })
-      // });
-
-      console.log("Sending to backend:", reassignmentData);
+      const res = await postReassignTasks(reassignmentData);
+      if (res && res.success) {
+        setLoading(false);
+        toast.success("Tasks reassigned successfully");
+        setOpen(false);
+        setCompleted(false);
+        setReassignments([]);
+      }
 
       // Simulate API call
-      setTimeout(() => {
-        setLoading(false);
-        setCompleted(true);
-
-        // Reset after 2 seconds
-        setTimeout(() => {
-          setOpen(false);
-          setCompleted(false);
-          setReassignments([]);
-          setEditingIndex(null);
-        }, 2000);
-      }, 1500);
     } catch (error) {
       console.error("Error reassigning tasks:", error);
       setLoading(false);
@@ -196,7 +171,6 @@ export default function ReassignTasksDialog({
 
         {!completed ? (
           <div className="space-y-4 mt-4">
-            {/* Current Status */}
             <Alert
               className={
                 overloadedCount > 0
@@ -269,17 +243,13 @@ export default function ReassignTasksDialog({
               })}
             </div>
 
-            {/* Reassignment Suggestions */}
             {reassignments?.length > 0 && (
               <div className="space-y-3">
                 <h3 className="font-semibold text-sm flex items-center justify-between">
                   <span>Proposed Reassignments:</span>
-                  <span className="text-xs text-slate-500 font-normal">
-                    Click "Choose Another" to change assignee
-                  </span>
                 </h3>
                 <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
-                  {reassignments.map((r, idx) => (
+                  {reassignments?.map((r, idx) => (
                     <Card key={idx} className="border-blue-200 bg-blue-50">
                       <CardContent className="p-3">
                         <div className="space-y-3">
@@ -287,18 +257,18 @@ export default function ReassignTasksDialog({
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">
-                                {r.taskId?.title}
+                                {r.taskTitle}
                               </p>
                               <div className="flex items-center gap-2 mt-1 flex-wrap">
                                 <Badge variant="outline" className="text-xs">
-                                  {r.taskId?.priority}
+                                  {r?.priority}
                                 </Badge>
                                 <span className="text-xs text-slate-600">
-                                  {r?.fromMemberId?.name}
+                                  {r?.fromMemberName}
                                 </span>
                                 <ArrowRight className="w-3 h-3 text-slate-400" />
                                 <span className="text-xs font-medium text-blue-700">
-                                  {r?.toMemberId?.name}
+                                  {r?.toMemberName}
                                 </span>
                               </div>
                             </div>
@@ -311,73 +281,6 @@ export default function ReassignTasksDialog({
                               Remove
                             </Button>
                           </div>
-
-                          {/* Member Selection */}
-                          {editingIndex === idx ? (
-                            <div className="flex items-center gap-2 pt-2 border-t">
-                              <UserCheck className="w-4 h-4 text-slate-500" />
-                              <Select
-                                value={r.toMemberId._id}
-                                onValueChange={(value) =>
-                                  handleChooseAnother(idx, value)
-                                }
-                              >
-                                <SelectTrigger className="h-9 flex-1 bg-white">
-                                  <SelectValue placeholder="Choose member" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {teamMembers
-                                    .filter((m) => m._id !== r.fromMemberId._id)
-                                    .map((member) => {
-                                      const workload = getMemberWorkload(
-                                        member._id
-                                      );
-                                      return (
-                                        <SelectItem
-                                          key={member._id}
-                                          value={member._id}
-                                        >
-                                          <div className="flex items-center justify-between w-full gap-4">
-                                            <span className="font-medium">
-                                              {member.name}
-                                            </span>
-                                            <span
-                                              className={`text-xs ${
-                                                workload?.isOverloaded
-                                                  ? "text-red-600 font-semibold"
-                                                  : "text-slate-500"
-                                              }`}
-                                            >
-                                              {workload?.projected}/
-                                              {workload?.capacity}
-                                              {workload?.isOverloaded && " ⚠️"}
-                                            </span>
-                                          </div>
-                                        </SelectItem>
-                                      );
-                                    })}
-                                </SelectContent>
-                              </Select>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setEditingIndex(null)}
-                                className="h-9"
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingIndex(idx as any)}
-                              className="w-full h-8 text-xs"
-                            >
-                              <UserCheck className="w-3 h-3 mr-2" />
-                              Choose Another Member
-                            </Button>
-                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -385,22 +288,6 @@ export default function ReassignTasksDialog({
                 </div>
               </div>
             )}
-
-            {/* Reassignment Rules */}
-            <Alert className="border-blue-200 bg-blue-50">
-              <AlertDescription className="text-xs text-slate-700">
-                <strong>Reassignment Rules:</strong>
-                <ul className="list-disc list-inside mt-1 space-y-1">
-                  <li>High priority tasks stay with current assignee</li>
-                  <li>Only Low and Medium priority tasks are moved</li>
-                  <li>Tasks assigned to members with free capacity</li>
-                  <li>
-                    You can manually change assignee using "Choose Another"
-                  </li>
-                  <li>All changes recorded in activity log</li>
-                </ul>
-              </AlertDescription>
-            </Alert>
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-2">
@@ -428,7 +315,6 @@ export default function ReassignTasksDialog({
                     variant="outline"
                     onClick={() => {
                       setReassignments([]);
-                      setEditingIndex(null);
                     }}
                     className="flex-1"
                     disabled={loading}
