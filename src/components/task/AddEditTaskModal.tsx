@@ -3,9 +3,7 @@
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-
   DialogContent,
-
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -59,10 +57,20 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
     if (member && member?.currentTasks > member?.capacity) {
       setSelectedMember(member);
       setShowWarning(true);
-      return; // DON'T set field yet
+      return;
     }
 
     setValue("assignedMemberId", memberId);
+  };
+
+  const handleAutoAssign = () => {
+    if (!teams?.members) return;
+
+    const autoMember = [...teams.members].sort(
+      (a, b) => a.currentTasks - b.currentTasks
+    )[0];
+
+    setValue("assignedMemberId", autoMember._id);
   };
 
   useEffect(() => {
@@ -77,7 +85,6 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
   };
 
   const handleOnSubmit = async (data: FieldValues) => {
-    console.log("first");
     setIsLoading(true);
     const res = await postTask(data);
     if (res && res.success) {
@@ -200,7 +207,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
               </div>
 
               {/* Project Select */}
-              <div className="space-y-2">
+              <div className="space-y-2 mt-[22px]">
                 <Label>Project *</Label>
                 <Controller
                   name="projectId"
@@ -241,10 +248,18 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
               </div>
 
               {/* Assigned Member */}
-
-              {/* Assigned Member */}
               <div className="space-y-2">
-                <Label>Assign To</Label>
+                <div className="flex justify-between items-center">
+                  <Label>Assign To</Label>
+                  <Button
+                    disabled={!teams?.members}
+                    type="button"
+                    className=" bg-amber-600 hover:bg-amber-700 text-white text-sm"
+                    onClick={handleAutoAssign}
+                  >
+                    Auto-assign
+                  </Button>
+                </div>
                 <Controller
                   name="assignedMemberId"
                   control={control}
@@ -293,7 +308,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
         </DialogContent>
       </Dialog>
       {/*  */}
-    
+
       <Dialog open={showWarning} onOpenChange={setShowWarning}>
         <DialogContent>
           <DialogHeader>
@@ -308,7 +323,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
             <Button
               variant="secondary"
               onClick={() => {
-                setShowWarning(false); 
+                setShowWarning(false);
               }}
             >
               Choose Another
@@ -316,7 +331,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
 
             <Button
               onClick={() => {
-                setValue("assignedMemberId", selectedMember._id); 
+                setValue("assignedMemberId", selectedMember._id);
                 setShowWarning(false);
               }}
             >
