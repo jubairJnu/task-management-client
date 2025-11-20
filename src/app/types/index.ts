@@ -53,6 +53,7 @@ export interface ITask {
   title: string;
   description: string;
   assignedMemberId: string;
+  assignedMemberName: string;
   priority: "Low" | "Medium" | "High";
   status: "Pending" | "In Progress" | "Done";
   projectId: string;

@@ -18,7 +18,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Loader2,
-  UserCheck,
 } from "lucide-react";
 import { IReassgingTask, ITask, TTeamSummary } from "@/app/types";
 import { postReassignTasks } from "@/lib/api";
@@ -34,14 +33,9 @@ export default function ReassignTasksDialog({
   const [reassignments, setReassignments] = useState<IReassgingTask[]>([]);
   const [completed, setCompleted] = useState(false);
 
-  console.log(reassignments, "ers");
-
   const calculateReassignments = () => {
     const suggestions: any = [];
 
-    console.log(suggestions, "suggestions");
-
-    // Find overloaded members
     const overloadedMembers = teamMembers.filter(
       (m) => m.isOverloaded && m.tasks
     );
@@ -102,15 +96,12 @@ export default function ReassignTasksDialog({
     setLoading(true);
 
     try {
-      // Prepare data for backend
       const reassignmentData = reassignments.map((r) => ({
         taskId: r.taskId,
         fromMemberId: r.fromMemberId,
         toMemberId: r.toMemberId,
       }));
 
-      // Send to your backend API
-      console.log("call apio", reassignmentData);
       const res = await postReassignTasks(reassignmentData);
       if (res && res.success) {
         setLoading(false);
@@ -119,8 +110,6 @@ export default function ReassignTasksDialog({
         setCompleted(false);
         setReassignments([]);
       }
-
-      // Simulate API call
     } catch (error) {
       console.error("Error reassigning tasks:", error);
       setLoading(false);
