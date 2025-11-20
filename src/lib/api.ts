@@ -167,6 +167,53 @@ export async function postTask(payload: any): Promise<any | null> {
     return null;
   }
 }
+//
+export async function updateTask(options: {
+  id: string;
+  payload: any;
+}): Promise<any | null> {
+  try {
+    const response = await fetch(`${config.api_url}/tasks/${options.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      body: JSON.stringify(options.payload),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create task");
+    }
+
+    const result = await response.json();
+    return result; // should contain success + data
+  } catch (error) {
+    console.error("Error creating task:", error);
+    return null;
+  }
+}
+export async function deleteTask(id: string): Promise<any | null> {
+  try {
+    const response = await fetch(`${config.api_url}/tasks/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create task");
+    }
+
+    const result = await response.json();
+    return result; // should contain success + data
+  } catch (error) {
+    console.error("Error creating task:", error);
+    return null;
+  }
+}
 
 export async function postReassignTasks(payload: any): Promise<any | null> {
   try {

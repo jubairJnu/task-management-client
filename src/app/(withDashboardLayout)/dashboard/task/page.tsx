@@ -9,11 +9,15 @@ import {
 } from "@/components/ui/table";
 import { ITask, TTeam } from "@/app/types";
 import AddEditTaskModal from "@/components/task/AddEditTaskModal";
-import { getProjects, getTasks, getTeamList } from "@/lib/api";
+import { deleteTask, getProjects, getTasks, getTeamList } from "@/lib/api";
 import { useEffect, useState } from "react";
-import { SquarePen } from "lucide-react";
+import { SquarePen, Trash } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import Loading from "@/utils/Loading";
 
 const TaskPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [taskList, setTaskList] = useState<ITask[]>([]);
   const [teamList, setTeamList] = useState<TTeam[]>([]);
   const [projectList, setProjectList] = useState<any[]>([]);
@@ -53,6 +57,19 @@ const TaskPage = () => {
 
     loadInitialData();
   }, []);
+
+  const handleDelete = async (id: string) => {
+    setIsLoading(true);
+    const res = await deleteTask(id);
+
+    if (res && res.success) {
+      setIsLoading(false);
+      toast.success("Deleted succesfully");
+    } else {
+      setIsLoading(false);
+      toast.error("someting went wrong");
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 h-screen overflow-y-auto">
@@ -127,11 +144,19 @@ const TaskPage = () => {
               <TableCell>{t.priority}</TableCell>
               <TableCell>{t.status}</TableCell>
               <TableCell>{t.assignedMemberName || "Unassgined"}</TableCell>
-              <TableCell>
+              <TableCell className="flex items-center gap-2.5">
                 <AddEditTaskModal
                   item={t}
                   title={<SquarePen className="text-green-500" />}
                 />
+                <Button
+                  disabled={isLoading}
+                  size={"icon"}
+                  variant={"destructive"}
+                  onClick={() => handleDelete(t._id)}
+                >
+                  {isLoading ? <Loading /> : <Trash />}
+                </Button>
               </TableCell>
             </TableRow>
           ))}

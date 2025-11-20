@@ -20,7 +20,13 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
-import { getProjects, getTeamListByProject, postTask } from "@/lib/api";
+import {
+  deleteTask,
+  getProjects,
+  getTeamListByProject,
+  postTask,
+  updateTask,
+} from "@/lib/api";
 
 import { toast } from "sonner";
 import Loading from "@/utils/Loading";
@@ -106,7 +112,13 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
 
   const handleOnSubmit = async (data: FieldValues) => {
     setIsLoading(true);
-    const res = await postTask(data);
+    let res;
+    if (isEditMode) {
+      res = await updateTask({ id: item._id, payload: data });
+    } else {
+      res = await postTask(data);
+    }
+
     if (res && res.success) {
       setIsLoading(false);
       toast.success("Added succesfully");
@@ -117,6 +129,7 @@ const AddEditTaskModal: FC<TTAddEdmitaskModalProps> = ({ item, title }) => {
       toast.error("someting went wrong");
     }
   };
+
 
   return (
     <div>
